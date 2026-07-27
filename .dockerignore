@@ -1,0 +1,14 @@
+.git/
+.gitignore
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
+README.md
+ROADMAP.md
+CLAUDE.md
+LICENSE
