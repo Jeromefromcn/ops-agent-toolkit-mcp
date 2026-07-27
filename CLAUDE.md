@@ -6,6 +6,10 @@ Keep any additions to this file short and direct.
 
 MCP server exposing read-only ops tools (logs, metrics, traces, service discovery/config) to an agent troubleshooting the sandbox in `lab-environment`.
 
+## Cross-repo contract
+
+This repo, `lab-environment`, and `spring-petclinic-microservices` don't share Claude Code session context — a session working here has no memory of what the other two assume. Before touching Consul KV paths, DB names, service names, or chaos toggle names, read `lab-environment/CLAUDE.md`'s "Cross-repo contract" table — that file is the single source of truth, not this one.
+
 ## Key commands
 
 - `python server.py` — run locally in stdio mode

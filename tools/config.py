@@ -8,8 +8,9 @@ from settings import CONSUL_URL, HTTP_TIMEOUT_SECONDS
 
 @audited
 async def get_service_config(service: str) -> dict:
-    """Read a service's current config from Consul KV
-    (config/<service>/data/*, including chaos.* toggles)."""
+    """Read a service's current static config from Consul KV
+    (config/<service>/data/*). Chaos toggles live under a separate
+    chaos/<service>/<name> prefix — see get_active_chaos_scenario()."""
     prefix = f"config/{service}/data/"
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as client:
         resp = await client.get(
