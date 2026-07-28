@@ -14,14 +14,12 @@ async def query_metric(
     threshold: float | None = None,
 ) -> dict:
     """Summarize a metric for a service over the last N minutes: mean, peak,
-    and (if a threshold is given) whether it was exceeded.
-
-    Never returns the raw time series — see CLAUDE.md conventions.
-    Matches instances scraped as "<service>:<port>" (see
-    lab-environment/observability/prometheus/prometheus.yml).
-    """
+    and (if a threshold is given) whether it was exceeded. Never returns
+    the raw time series."""
     now = time.time()
     start = now - minutes_ago * 60
+    # Prometheus scrapes instances as "<service>:<port>" (see
+    # lab-environment/observability/prometheus/prometheus.yml).
     query = f'{metric_name}{{instance=~"^{service}:.*"}}'
     params = {"query": query, "start": start, "end": now, "step": "15s"}
 

@@ -8,14 +8,12 @@ from settings import HTTP_TIMEOUT_SECONDS, LOKI_URL
 
 @audited
 async def search_logs(service: str, keyword: str, minutes_ago: int = 15) -> dict:
-    """Search a service's logs for a keyword within the last N minutes.
-
-    Backed by Loki. Logs are labeled `service="<container name>"` by
-    promtail's docker service discovery (see lab-environment/observability).
-    """
+    """Search a service's logs for a keyword within the last N minutes."""
     now_ns = time.time_ns()
     start_ns = now_ns - minutes_ago * 60 * 1_000_000_000
 
+    # `service` label is set by promtail's docker service discovery to the
+    # container name (see lab-environment/observability).
     query = f'{{service="{service}"}} |= "{keyword}"'
     params = {"query": query, "start": start_ns, "end": now_ns, "limit": 100}
 

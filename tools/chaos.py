@@ -12,13 +12,12 @@ class InvalidChaosScenarioName(ValueError):
 
 @audited
 async def toggle_chaos_scenario(service: str, scenario: str, enabled: bool) -> dict:
-    """Enable/disable a fault scenario. The ONLY write-capable tool in this
-    server — strictly scoped to chaos/<service>/<scenario>, a top-level
-    Consul KV prefix kept separate from config/ so a toggle write never
-    triggers Spring Cloud Consul Config's watch/refresh (see
-    lab-environment/CLAUDE.md's cross-repo contract). Never writes real app
-    config. See CLAUDE.md design principles.
-    """
+    """Enable or disable a fault-injection scenario for testing. The only
+    write-capable tool in this server; never writes real app config."""
+    # Scoped to the top-level chaos/<service>/<scenario> Consul KV prefix,
+    # kept separate from config/ so a toggle write never triggers Spring
+    # Cloud Consul Config's watch/refresh (see lab-environment/CLAUDE.md's
+    # cross-repo contract).
     if not scenario or "/" in scenario:
         raise InvalidChaosScenarioName(
             f"scenario must be a bare toggle name with no '/', got: {scenario!r}"
@@ -36,13 +35,11 @@ async def toggle_chaos_scenario(service: str, scenario: str, enabled: bool) -> d
 
 @audited
 async def get_active_chaos_scenario() -> dict:
-    """List every chaos/<service>/<name> toggle currently set to true, across
-    all services.
-
-    Ground-truth lookup for a given scenario name lives in
-    lab-environment/scenarios/scenarios.yaml — this tool only reports what's
-    live in Consul KV, it does not know about that file.
-    """
+    """List every chaos scenario currently enabled, across all services.
+    Reports live Consul state only, not the catalog of available scenario
+    types."""
+    # chaos/<service>/<name> toggles; the scenario catalog itself lives in
+    # lab-environment/scenarios/scenarios.yaml, which this tool never reads.
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as client:
         resp = await client.get(f"{CONSUL_URL}/v1/kv/chaos/", params={"recurse": "true"})
 
