@@ -8,10 +8,13 @@ from settings import CONSUL_URL, HTTP_TIMEOUT_SECONDS
 
 @audited
 async def get_service_config(service: str) -> dict:
-    """Read a service's static config. For chaos-toggle state, use
-    get_active_chaos_scenario() instead."""
-    # config/<service>/data/* in Consul KV; chaos/<service>/<name> is a
-    # separate top-level prefix, not under this one.
+    """Read a service's static config."""
+    # config/<service>/data/* in Consul KV. Deliberately does not mention
+    # chaos/<service>/<name> (a separate top-level prefix) anywhere in this
+    # docstring: an eval-harness diagnosing agent that's denied
+    # get_active_chaos_scenario must not learn the tool exists from a
+    # sibling tool's description either — see lab-environment's
+    # docs/superpowers/specs/2026-07-30-eval-harness-design.md for why.
     prefix = f"config/{service}/data/"
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as client:
         resp = await client.get(
