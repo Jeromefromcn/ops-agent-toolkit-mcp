@@ -9,12 +9,15 @@ from settings import CONSUL_URL, HTTP_TIMEOUT_SECONDS
 @audited
 async def get_service_config(service: str) -> dict:
     """Read a service's static config."""
-    # config/<service>/data/* in Consul KV. Deliberately does not mention
-    # chaos/<service>/<name> (a separate top-level prefix) anywhere in this
-    # docstring: an eval-harness diagnosing agent that's denied
-    # get_active_chaos_scenario must not learn the tool exists from a
-    # sibling tool's description either — see lab-environment's
-    # docs/superpowers/specs/2026-07-30-eval-harness-design.md for why.
+    # config/<service>/data/* in Consul KV.
+    #
+    # This docstring must never name or describe any other tool in this
+    # server: MCP sends a tool's __doc__ to every connected client as its
+    # description, and an eval-harness agent that's denied some other tool
+    # must not learn that tool exists this way (see this file's git history
+    # for the incident that motivated this rule; lab-environment's
+    # docs/superpowers/specs/2026-07-30-eval-harness-design.md has the
+    # broader isolation design this protects).
     prefix = f"config/{service}/data/"
     async with httpx.AsyncClient(timeout=HTTP_TIMEOUT_SECONDS) as client:
         resp = await client.get(
